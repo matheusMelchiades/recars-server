@@ -4,7 +4,7 @@ module.exports = (app) => {
     const { fieldsPermissions } = app.api.controllers
 
     app.route('/fields')
-        .all(authenticate())
+        // .all(authenticate())
         .get(fieldsPermissions.getFieldsByRole)
         .post(fieldsPermissions.createField)
 

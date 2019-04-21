@@ -1,9 +1,9 @@
-const { authSecret, timeExpirateToken } = require('../../config/system');
 const jwt = require('jwt-simple');
 const encryption = require('../../helper/encryption');
 const time = require('../../helper/time');
 
 module.exports = (app) => {
+    const { authSecret, timeExpirateToken } = app.config.system
     const model = app.api.models.users;
 
     const getAll = async (req, res) => {
@@ -38,7 +38,6 @@ module.exports = (app) => {
     const signin = async (req, res) => {
         try {
             const { username, password } = req.body;
-
             if (!username || !password) return res.status(400).send('Incomplete Data!');
 
             const user = await model.findOne({ username });
@@ -59,6 +58,7 @@ module.exports = (app) => {
             } else
                 return res.status(400).send('User not found');
         } catch (err) {
+            console.log(err)
             return res.status(409).send('Error');
         };
     };

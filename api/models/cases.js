@@ -3,12 +3,17 @@ const mongoose = require('mongoose');
 const CasesSchema = new mongoose.Schema(
     {
         'model': String,
-        'branch': String,
+        'brand': String,
         'category': String,
         'type': String,
         'generalUse': String,
         'competence': String,
-        'price': String
+        'price': String,
+        'status': {
+            type: String,
+            enum: ['PENDING', 'APPROVE'],
+            default: 'PENDING'
+        }
     },
     {
         versionKey: false,

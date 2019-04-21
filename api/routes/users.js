@@ -9,6 +9,6 @@ module.exports = (app) => {
         .post(users.signin);
 
     app.route('/users')
-        .all(authenticate())
+        // .all(authenticate())
         .get(users.getAll);
 };
