@@ -5,6 +5,8 @@ module.exports = (app) => {
     const getFieldsByRole = async (req, res) => {
         try {
 
+            if (!req.user) return res.status(400).send('User not auth')
+
             const fieldDB = await model.findOne({ userRole: req.user.role })
 
             if (!fieldDB && !fieldDB.fields) return res.status(400).send('Error')
@@ -37,7 +39,6 @@ module.exports = (app) => {
             return res.status(400).send(err)
         }
     }
-
 
     return { getFieldsByRole, createField };
 };

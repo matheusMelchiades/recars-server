@@ -19,6 +19,8 @@ module.exports = (app) => {
 
     const getCasesPending = async (req, res) => {
         try {
+            console.log(req.user)
+            if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('User not Authenticate')
 
             const casesPending = await model.find({ status: 'PENDING' })
 
