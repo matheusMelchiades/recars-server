@@ -1,20 +1,19 @@
-const { azure } = require('../services/APIs')
+const { azure } = require('../services/APIs');
 
 module.exports = (app) => {
     const { url, key } = app.config.system.integrations.azure;
     const API = azure(url, key);
 
-    searchImages = async (search) => {
+    const searchImages = async (search) => {
         try {
-            const response = await API.get(`?q=${search}carro&count=15`)
+            const response = await API.get(`?q=${search}carro&count=30`);
 
-            if (response.status !== 200) return []
-
-            return response.data
+            if (response.status !== 200) return [];
+            return response.data;
         } catch (err) {
-            console.log('Error azure integration')
+            console.log('Error azure integration');
         }
     };
 
-    return { searchImages }
-}
+    return { searchImages };
+};

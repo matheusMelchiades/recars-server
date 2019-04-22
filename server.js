@@ -11,7 +11,6 @@ consign()
     .then('api/routes')
     .into(app);
 
-
 app.listen(port, () => {
     console.log(`🌎  Go to http://localhost:${port}`);
 });

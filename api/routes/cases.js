@@ -3,6 +3,7 @@ module.exports = (app) => {
     const { cases } = app.api.controllers;
 
     app.route('/cases')
+        .all(authenticate())
         .get(cases.getAll)
         .post(cases.create);
 

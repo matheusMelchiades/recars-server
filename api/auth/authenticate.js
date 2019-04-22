@@ -18,7 +18,7 @@ module.exports = (app) => {
 
             return cb(null, {
                 _id: user._id,
-                username: user._id,
+                username: user.username,
                 role: user.role
             });
 

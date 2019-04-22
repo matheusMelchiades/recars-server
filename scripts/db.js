@@ -1,4 +1,6 @@
-//FIELDS PERMISSIONS
+/* eslint-disable */
+
+// FIELDS PERMISSIONS
 db.fieldsPermissions.insertMany([
     {
         "userRole": "ADMIN",

@@ -1,6 +1,8 @@
 module.exports = (app) => {
+    const { authenticate } = app.api.auth.authenticate;
     const { brands } = app.api.controllers;
 
     app.route('/brands')
-        .get(brands.getAll)
+        .all(authenticate())
+        .get(brands.getAll);
 };

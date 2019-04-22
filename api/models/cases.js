@@ -8,7 +8,9 @@ const CasesSchema = new mongoose.Schema(
         'type': String,
         'generalUse': String,
         'competence': String,
-        'price': String,
+        'priceAverage': Number,
+        'images': Array,
+        'createdBy': Object,
         'status': {
             type: String,
             enum: ['PENDING', 'APPROVE'],
