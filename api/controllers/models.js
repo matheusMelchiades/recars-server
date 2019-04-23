@@ -17,7 +17,7 @@ module.exports = (app) => {
                     '$regex': search,
                     '$options': 'i'
                 }
-            }
+            };
 
             if (brand && ObjectId.isValid(brand))
                 query.brand_id = ObjectId(brand);
