@@ -16,4 +16,4 @@ module.exports = (app) => ({
             key: process.env.API_IMG_KEY || ''
         }
     }
-})  ;
+});

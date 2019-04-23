@@ -3,7 +3,7 @@ const encryption = require('../../helper/encryption');
 const time = require('../../helper/time');
 
 module.exports = (app) => {
-    const { authSecret, timeExpirateToken } = app.config.system
+    const { authSecret, timeExpirateToken } = app.config.system;
     const model = app.api.models.users;
 
     const getAll = async (req, res) => {
@@ -16,13 +16,11 @@ module.exports = (app) => {
         try {
             const { username, password } = req.body;
 
-            //CHECK PARAMS
             if (!username || !password) return res.status(400).send('Incomplete Data!');
 
-            //CHECK ALREADY EXISTS USERSNAME
-            const usersDb = await model.findOne({ username: username })
+            const usersDb = await model.findOne({ username: username });
 
-            if (usersDb) return res.status(400).send('Username Alredy registred!')
+            if (usersDb) return res.status(400).send('Username Alredy registred!');
 
             let passEncrypted = await encryption.encrypt(password);
 
@@ -58,7 +56,7 @@ module.exports = (app) => {
             } else
                 return res.status(400).send('User not found');
         } catch (err) {
-            console.log(err)
+            console.log(err);
             return res.status(409).send('Error');
         };
     };
