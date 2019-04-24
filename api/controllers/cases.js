@@ -16,10 +16,6 @@ module.exports = (app) => {
 
         if (User.role === 'USER') return res.status(400).send({message: 'Usuario nao autorizado!'});
 
-        const check = await model.findOne(oneCase);
-
-        if (check) return res.status(222).send({message: 'Caso ja cadastrado!'});
-
         const result = await model.create({ ...oneCase, createdBy: User });
 
         if (!result) return res.status(400).send({message: 'Erro Desconhecido'});
@@ -29,8 +25,7 @@ module.exports = (app) => {
 
     const getCasesPending = async (req, res) => {
         try {
-            // console.log(req.user);
-            // if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('User not Authenticate')
+            if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('Usuario Nao autorizado!');
 
             const casesPending = await model.find({ status: 'PENDING' });
 
