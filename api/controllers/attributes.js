@@ -17,8 +17,11 @@ module.exports = (app) => {
 
     const getAllToSearch = async (req, res) => {
         try {
+            const attributes = await model.getAllToSearch({});
 
-            return res.status(200).send('SEARCH');
+            if (!attributes) return res.status(400).send('NOT found Attributes');
+
+            return res.status(200).send(attributes);
         } catch (err) {
             console.log(err);
             return res.status(400).send('ERROR');

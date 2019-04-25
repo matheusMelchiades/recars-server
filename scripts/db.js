@@ -48,3 +48,20 @@ db.getCollection('cases').updateMany(
         upsert: true
     }
 )
+
+
+
+//finds
+
+db.getCollection('attributes_copy').aggregate([
+    { $project: { options: 1 } }
+])
+
+db.getCollection('attributes_copy').aggregate([
+    { $group: {_id: null, childrens: {$push: "$options.childrens"}}}
+])
+
+db.getCollection('attributes_copy').aggregate([
+    { $group: {_id: null, childrens: {$push: "$options.parent"}}},
+    { $project: {_id: 0,'childrens': 1}}
+])
