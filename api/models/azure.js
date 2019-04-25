@@ -6,7 +6,7 @@ module.exports = (app) => {
 
     const searchImages = async (search) => {
         try {
-            const response = await API.get(`?q=${search}carro&count=30`);
+            const response = await API.get(`?q=${search}&count=30`);
 
             if (response.status !== 200) return [];
             return response.data;

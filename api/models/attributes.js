@@ -20,10 +20,28 @@ AttributesSchema.statics.getAllToCreate = function () {
             const result = {};
 
             attributes.map((item) => {
-                const childrens = (opt) => opt.childrens;
+                const toRegister = (opt) => opt.register;
                 const allOptions = (a, b) => [...a, ...b];
 
-                result[item.register.field] = item.options.map(childrens).reduce(allOptions);
+                result[item.register.field] = item.options.map(toRegister).reduce(allOptions);
+            });
+
+            resolve(result);
+        });
+    });
+};
+
+AttributesSchema.statics.getAllToSearch = function () {
+    return new Promise((resolve, reject) => {
+        this.find({}, (err, attributes) => {
+            if (err) reject(err);
+
+            const result = {};
+
+            attributes.map((item) => {
+                const parent = (opt) => opt.search;
+
+                result[item.search.field] = item.options.map(parent);
             });
 
             resolve(result);

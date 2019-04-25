@@ -8,6 +8,7 @@ const CasesSchema = new mongoose.Schema(
         'type': String,
         'generalUse': String,
         'competence': String,
+        'priceAverage': Number,
         'images': Array,
         'createdBy': Object,
         'status': {
