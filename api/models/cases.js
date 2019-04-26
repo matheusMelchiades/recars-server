@@ -2,15 +2,19 @@ const mongoose = require('mongoose');
 
 const CasesSchema = new mongoose.Schema(
     {
-        'model': String,
-        'brand': String,
-        'category': String,
-        'type': String,
-        'generalUse': String,
-        'competence': String,
-        'priceAverage': Number,
+        'model': { type: String, required: true },
+        'brand': { type: String, required: true },
+        'category': { type: String, required: true },
+        'type': { type: String, required: true },
+        'generalUse': { type: String, required: true },
+        'competence': { type: String, required: true },
+        'priceAverage': { type: Number, required: true },
         'images': Array,
-        'createdBy': Object,
+        'createdBy': {
+            type: mongoose.Schema.Types.ObjectId,
+            red: 'users',
+            required: true
+        },
         'status': {
             type: String,
             enum: ['PENDING', 'APPROVE'],

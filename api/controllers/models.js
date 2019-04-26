@@ -2,19 +2,18 @@ const ObjectId = require('mongoose').Types.ObjectId;
 
 module.exports = (app) => {
 
-    const model = app.api.models.models;
-    // const brandModel = app.api.models.brands;
+    const modelCar = app.api.models.models;
 
     const getAll = async (req, res) => {
-        const { brand, search } = req.query;
+        const { brand, model } = req.query;
         const User = req.user;
 
         if (User.role === 'USER') return res.status(400).send('Unauthorized');
 
-        if (brand || search) {
+        if (brand || model) {
             const query = {
                 name: {
-                    '$regex': search,
+                    '$regex': model,
                     '$options': 'i'
                 }
             };
@@ -22,7 +21,7 @@ module.exports = (app) => {
             if (brand && ObjectId.isValid(brand))
                 query.brand_id = ObjectId(brand);
 
-            const modelsByBrandId = await model.find(query);
+            const modelsByBrandId = await modelCar.find(query);
 
             if (!modelsByBrandId) return res.status(400).send([]);
 

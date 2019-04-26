@@ -14,11 +14,11 @@ module.exports = (app) => {
         const { oneCase } = req.body;
         const User = req.user;
 
-        if (User.role === 'USER') return res.status(400).send({message: 'Usuario nao autorizado!'});
+        if (User.role === 'USER') return res.status(400).send({ message: 'Usuario nao autorizado!' });
 
         const result = await model.create({ ...oneCase, createdBy: User });
 
-        if (!result) return res.status(400).send({message: 'Erro Desconhecido'});
+        if (!result) return res.status(400).send({ message: 'Erro Desconhecido' });
 
         return res.status(200).send('created successful!');
     };
