@@ -27,7 +27,7 @@ module.exports = (app) => {
         try {
             if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('Usuario Nao autorizado!');
 
-            const casesPending = await model.find({ status: 'PENDING' });
+            const casesPending = await model.find({ status: 'PENDING' }).populate('createdBy', { _id: 1, username: 1 });
 
             if (!casesPending) return res.status(400).send('Error in search cases pending');
 
