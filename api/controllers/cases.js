@@ -29,8 +29,6 @@ module.exports = (app) => {
 
             const casesPending = await model.find({ status: 'PENDING' }).populate('createdBy', { _id: 1, username: 1 });
 
-            console.log(casesPending);
-
             if (!casesPending) return res.status(400).send('Error in search cases pending');
 
             return res.status(200).send(casesPending);
