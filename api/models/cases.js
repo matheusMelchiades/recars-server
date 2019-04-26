@@ -12,7 +12,7 @@ const CasesSchema = new mongoose.Schema(
         'images': Array,
         'createdBy': {
             type: mongoose.Schema.Types.ObjectId,
-            red: 'users',
+            ref: 'users',
             required: true
         },
         'status': {
