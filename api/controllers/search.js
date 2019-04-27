@@ -1,16 +1,24 @@
+const helper = require('../../helper/algorithms');
+
 module.exports = (app) => {
 
     const models = app.api.models;
 
     const find = async (req, res) => {
         try {
+
             const search = await models.searchs.create({ ...req.body, user: { ...req.user } });
-            const cases = await models.cases.find({}).limit(10);
+            const cases = await models.cases.find({});
 
             if (!search) return res.status(400).send('ERROR');
             if (!cases) return res.status(400).send('ERROR');
 
-            return res.status(200).send(cases);
+            const searchValues = await models.attributes.getValuesBySearch({ ...req.body });
+            const casesValues = await models.attributes.getValuesByCases(cases);
+
+            const cars = helper.calculateSimCars(casesValues, searchValues);
+
+            return res.status(200).send(cars);
         } catch (err) {
             console.log(err);
             return res.status(400).send('ERROR');

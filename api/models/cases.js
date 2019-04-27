@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 const CasesSchema = new mongoose.Schema(
     {
@@ -10,20 +11,75 @@ const CasesSchema = new mongoose.Schema(
         'competence': { type: String, required: true },
         'priceAverage': { type: Number, required: true },
         'images': Array,
-        'createdBy': {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'users',
-            required: true
-        },
         'status': {
             type: String,
             enum: ['PENDING', 'APPROVE'],
             default: 'PENDING'
+        },
+        'quantity': {
+            type: Number,
+            default: 1
+        },
+        'createdBy': {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
+            required: true
         }
     },
     {
         versionKey: false,
         timestamps: true
+    }
+);
+
+CasesSchema.statics.createCase = function (oneCase) {
+    return new Promise((resolve, reject) => {
+        const images = oneCase.images;
+        delete oneCase.images;
+
+        this.findOne(oneCase, (err, caseDb) => {
+            if (err) return reject(err);
+
+            if (!caseDb) {
+                this.create({ ...oneCase, images }, (err, caseCreated) => {
+                    if (err) return reject(err);
+
+                    return resolve(caseCreated);
+                });
+            } else {
+                this.update({ _id: ObjectId(caseDb._id) },
+                    {
+                        '$set': {
+                            quantity: caseDb.quantity + 1
+                        }
+                    },
+                    { upsert: true }, (err, caseUpdated) => {
+                        if (err) return reject(err);
+                        return resolve(caseUpdated);
+                    }
+                );
+            }
+        });
     });
+};
+
+CasesSchema.statics.findPending = function () {
+    return this.find({ status: 'PENDING' }).populate('createdBy', { _id: 1, username: 1 });
+};
+
+CasesSchema.statics.findApproved = function () {
+    return this.find({ status: 'APPROVE' }).populate('createdBy', { _id: 1, username: 1 });
+};
+
+CasesSchema.statics.ApprovePendencies = function (pendencies) {
+
+    const query = {
+        '_id': {
+            '$in': pendencies.map((casePend) => ObjectId(casePend._id))
+        }
+    };
+
+    return this.updateMany(query, { '$set': { status: 'APPROVE' } }, { upsert: true });
+};
 
 module.exports = app => mongoose.model('cases', CasesSchema);
