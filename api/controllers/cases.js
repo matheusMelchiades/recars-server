@@ -1,5 +1,3 @@
-const ObjectId = require('mongoose').Types.ObjectId;
-
 module.exports = (app) => {
 
     const model = app.api.models.cases;
@@ -11,23 +9,27 @@ module.exports = (app) => {
     };
 
     const create = async (req, res) => {
-        const { oneCase } = req.body;
-        const User = req.user;
+        try {
+            const { oneCase } = req.body;
+            const User = req.user;
 
-        if (User.role === 'USER') return res.status(400).send({ message: 'Usuario nao autorizado!' });
+            if (User.role === 'USER') return res.status(400).send({ message: 'Usuario nao autorizado!' });
 
-        const result = await model.create({ ...oneCase, createdBy: User });
+            const result = await model.createCase({ ...oneCase, createdBy: User });
 
-        if (!result) return res.status(400).send({ message: 'Erro Desconhecido' });
+            if (!result) return res.status(400).send({ message: 'Erro Desconhecido' });
 
-        return res.status(200).send('created successful!');
+            return res.status(200).send('created successful!');
+        } catch (err) {
+            return res.status(400).send('Error Desconhecido');
+        }
     };
 
     const getCasesPending = async (req, res) => {
         try {
             if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('Usuario Nao autorizado!');
 
-            const casesPending = await model.find({ status: 'PENDING' }).populate('createdBy', { _id: 1, username: 1 });
+            const casesPending = await model.findPending();
 
             if (!casesPending) return res.status(400).send('Error in search cases pending');
 
@@ -43,22 +45,13 @@ module.exports = (app) => {
 
             if (!pendencies || !pendencies.length) return res.status(400).send('ERROR APPROVE CASE');
 
-            const query = {
-                '_id': {
-                    '$in': pendencies.map((casePend) => ObjectId(casePend._id))
-                }
-            };
-
-            const result = await model.updateMany(query, {
-                '$set': { status: 'APPROVE' }
-            }, { upsert: true });
+            const result = await model.ApprovePendencies(pendencies);
 
             if (!result) return res.status(400).send('Error in Changes');
 
             return res.status(200).send([]);
         } catch (err) {
             console.log(err);
-
             return res.status(500).send([]);
         }
     };
