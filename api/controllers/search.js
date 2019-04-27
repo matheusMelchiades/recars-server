@@ -8,7 +8,7 @@ module.exports = (app) => {
         try {
 
             const search = await models.searchs.create({ ...req.body, user: { ...req.user } });
-            const cases = await models.cases.find({});
+            const cases = await models.cases.findBeetweenPrices(req.body.priceAverage, 10000);
 
             if (!search) return res.status(400).send('ERROR');
             if (!cases) return res.status(400).send('ERROR');
