@@ -50,7 +50,8 @@ CasesSchema.statics.createCase = function (oneCase) {
                 this.update({ _id: ObjectId(caseDb._id) },
                     {
                         '$set': {
-                            quantity: caseDb.quantity + 1
+                            'quantity': caseDb.quantity + 1,
+                            'status': 'PENDING'
                         }
                     },
                     { upsert: true }, (err, caseUpdated) => {
@@ -80,6 +81,20 @@ CasesSchema.statics.ApprovePendencies = function (pendencies) {
     };
 
     return this.updateMany(query, { '$set': { status: 'APPROVE' } }, { upsert: true });
+};
+
+CasesSchema.statics.findBeetweenPrices = function (priceAverage = 0, value) {
+    // const price = parseInt(priceAverage);
+    // const max = parseInt(price + value);
+    // const min = parseInt(price - value);
+
+    return this.findApproved({
+        'status': 'APPROVE',
+        'priceAverage': {
+            '$lt': priceAverage
+            // '$gt': min
+        }
+    });
 };
 
 module.exports = app => mongoose.model('cases', CasesSchema);
