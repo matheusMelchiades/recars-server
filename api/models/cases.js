@@ -83,16 +83,12 @@ CasesSchema.statics.ApprovePendencies = function (pendencies) {
     return this.updateMany(query, { '$set': { status: 'APPROVE' } }, { upsert: true });
 };
 
-CasesSchema.statics.findBeetweenPrices = function (priceAverage = 0, value) {
-    // const price = parseInt(priceAverage);
-    // const max = parseInt(price + value);
-    // const min = parseInt(price - value);
-
-    return this.findApproved({
+CasesSchema.statics.findBeetweenPrices = function (min, max) {
+    return this.find({
         'status': 'APPROVE',
         'priceAverage': {
-            '$lt': priceAverage
-            // '$gt': min
+            '$gt': parseInt(min),
+            '$lt': parseInt(max)
         }
     });
 };

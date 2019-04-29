@@ -3,8 +3,8 @@ module.exports = (app) => {
     const { cases } = app.api.controllers;
 
     app.route('/cases')
-        .all(authenticate())
         .get(cases.getAll)
+        .all(authenticate())
         .post(cases.create);
 
     app.route('/cases/pending')

@@ -8,7 +8,7 @@ module.exports = (app) => {
         try {
 
             const search = await models.searchs.create({ ...req.body, user: { ...req.user } });
-            const cases = await models.cases.findBeetweenPrices(req.body.priceAverage, 10000);
+            const cases = await models.cases.findBeetweenPrices(req.body.priceMin, req.body.priceMax);
 
             if (!search) return res.status(400).send('ERROR');
             if (!cases) return res.status(400).send('ERROR');
@@ -16,7 +16,7 @@ module.exports = (app) => {
             const searchValues = await models.attributes.getValuesBySearch({ ...req.body });
             const casesValues = await models.attributes.getValuesByCases(cases);
 
-            const cars = helper.calculateSimCars(casesValues, searchValues);
+            const cars = helper.calculateSimCars(casesValues, searchValues, ['category', 'type', 'generalUse', 'competence']);
 
             return res.status(200).send(cars);
         } catch (err) {

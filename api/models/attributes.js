@@ -63,16 +63,12 @@ AttributesSchema.statics.getValuesBySearch = function (search) {
                     if (itemSearch.search !== search[field]) return;
 
                     result[item.register.field] = {
-                        'labelSearch': search[field],
                         'value': itemSearch.value
                     };
                 });
             });
 
-            resolve({
-                ...result,
-                'priceAverage': search.priceAverage
-            });
+            resolve({ ...result });
         });
     });
 };
@@ -94,7 +90,6 @@ AttributesSchema.statics.getValuesByCases = function (cases = []) {
                         if (!itemCase.register.includes(aCase[field])) return;
 
                         resultCase[field] = {
-                            'labelSearch': aCase[field],
                             'value': itemCase.value
                         };
                     });

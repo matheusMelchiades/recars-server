@@ -1,65 +1,48 @@
-const jwt = require('jwt-simple');
-const encryption = require('../../helper/encryption');
-const time = require('../../helper/time');
 
 module.exports = (app) => {
-    const { authSecret, timeExpirateToken } = app.config.system;
     const model = app.api.models.users;
-
-    const getAll = async (req, res) => {
-        const users = await model.find({}, { _id: 1, username: 1 });
-
-        return res.status(200).send(users);
-    };
 
     const signup = async (req, res) => {
         try {
             const { username, password } = req.body;
 
-            if (!username || !password) return res.status(400).send('Incomplete Data!');
+            if (!username || !password)
+                return res.status(401).send({ message: 'Incomplete Data!' });
 
             const usersDb = await model.findOne({ username: username });
 
-            if (usersDb) return res.status(400).send('Username Alredy registred!');
+            if (usersDb)
+                return res.status(401).send({ message: 'Username Alredy registred!' });
 
-            let passEncrypted = await encryption.encrypt(password);
+            await model.create({ username, password });
 
-            const user = await model.create({ username, password: passEncrypted });
-
-            if (user)
-                return res.status(200).send('Created with success!');
+            return res.status(200).send({ message: 'Criado com sucesso!' });
         } catch (err) {
-            return res.status(500).send(err);
+            return res.status(500).send({ message: 'Erro interno' });
         }
     };
 
     const signin = async (req, res) => {
         try {
             const { username, password } = req.body;
-            if (!username || !password) return res.status(400).send('Incomplete Data!');
 
-            const user = await model.findOne({ username });
+            if (!username || !password)
+                return res.status(401).send({ message: 'Incomplete Data!' });
 
-            if (user) {
-                let checkPass = await encryption.check(password, user.password);
+            const user = await model.getToken(req.body);
 
-                if (!checkPass) return res.status(500).send('Username or password invalid');
+            if (!user)
+                return res.status(401).send({ message: 'User not found' });
 
-                return res.status(200).send({
-                    username: user.username,
-                    token: jwt.encode({
-                        _id: user._id,
-                        expirate: time.addMinutes(new Date(), timeExpirateToken)
-                    }, authSecret)
-                });
+            if (!user.token)
+                return res.status(401).send({ message: 'Username or password invalid' });
 
-            } else
-                return res.status(400).send('User not found');
+            return res.status(200).send(user);
+
         } catch (err) {
-            console.log(err);
-            return res.status(409).send('Error');
+            return res.status(500).send({ message: 'Erro interno' });
         };
     };
 
-    return { getAll, signup, signin };
+    return { signup, signin };
 };

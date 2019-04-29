@@ -11,8 +11,4 @@ module.exports = (app) => {
     app.route('/auth')
         .all(authenticate())
         .get((req, res) => res.status(200).send([]));
-
-    app.route('/users')
-        .all(authenticate())
-        .get(users.getAll);
 };

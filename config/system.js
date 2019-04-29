@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = (app) => ({
     authSecret: process.env.AUTH_SECRET || '',
     timeExpirateToken: 60,
-    connection: {
+    db: {
         database: process.env.DB_NAME || '',
         host: process.env.DB_HOST || '',
         port: process.env.DB_PORT || '',

@@ -6,8 +6,7 @@ const equation = (x, y) => {
     return Math.sqrt(x.reduce((current, next, index) => current + ((x.length - index) * Math.abs(x[index] - y[index])), 0));
 };
 
-const calculateSimCars = (cases, search) => {
-    const fields = ['category', 'type', 'generalUse', 'competence'];
+const calculateSimCars = (cases, search, fields) => {
     const searchValues = getValuesByField(search, fields);
 
     const result = cases.map((oneCase) => {
@@ -19,7 +18,7 @@ const calculateSimCars = (cases, search) => {
         };
     });
 
-    return result.slice(0, 9).sort((a, b) => a.weight - b.weight);
+    return result.slice(0, 9).sort((a, b) => a.weight + b.weight);
 };
 
 module.exports = { calculateSimCars };
