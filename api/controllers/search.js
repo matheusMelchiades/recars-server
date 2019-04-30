@@ -16,7 +16,9 @@ module.exports = (app) => {
             const searchValues = await models.attributes.getValuesBySearch({ ...req.body });
             const casesValues = await models.attributes.getValuesByCases(cases);
 
-            const cars = helper.calculateSimCars(casesValues, searchValues, ['category', 'type', 'generalUse', 'competence']);
+            const result = helper.calculateSimCars(casesValues, searchValues, ['category', 'type', 'generalUse', 'competence']);
+
+            const cars = await models.cars.findCarByModelMany(result);
 
             return res.status(200).send(cars);
         } catch (err) {

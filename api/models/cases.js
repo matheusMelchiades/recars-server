@@ -13,7 +13,7 @@ const CasesSchema = new mongoose.Schema(
         'images': Array,
         'status': {
             type: String,
-            enum: ['PENDING', 'APPROVE'],
+            enum: ['PENDING', 'HOMOLOG', 'DELETED', 'APPROVE'],
             default: 'PENDING'
         },
         'quantity': {
@@ -65,11 +65,27 @@ CasesSchema.statics.createCase = function (oneCase) {
 };
 
 CasesSchema.statics.findPending = function () {
-    return this.find({ status: 'PENDING' }).populate('createdBy', { _id: 1, username: 1 });
+    return this.find({ status: { $in: ['PENDING', 'HOMOLOG'] } }).populate('createdBy', { _id: 1, username: 1 });
 };
 
-CasesSchema.statics.findApproved = function () {
-    return this.find({ status: 'APPROVE' }).populate('createdBy', { _id: 1, username: 1 });
+CasesSchema.statics.findPendingByHelper = function (username) {
+    return this.aggregate([
+        { '$match': { 'status': 'PENDING' } },
+        {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'createdBy',
+                'foreignField': '_id',
+                'as': 'createdBy'
+            }
+        },
+        { '$unwind': '$createdBy' },
+        { '$match': { 'createdBy.username': username } }
+    ]);
+};
+
+CasesSchema.statics.findCases = function () {
+    return this.find({ 'status': { '$in': ['APPROVE', 'DELETED'] } }).populate('createdBy', { _id: 1, username: 1 });
 };
 
 CasesSchema.statics.ApprovePendencies = function (pendencies) {
@@ -81,6 +97,28 @@ CasesSchema.statics.ApprovePendencies = function (pendencies) {
     };
 
     return this.updateMany(query, { '$set': { status: 'APPROVE' } }, { upsert: true });
+};
+
+CasesSchema.statics.ApprovePendenciesByHelper = function (pendencies) {
+
+    const query = {
+        '_id': {
+            '$in': pendencies.map((casePend) => ObjectId(casePend._id))
+        }
+    };
+
+    return this.updateMany(query, { '$set': { status: 'HOMOLOG' } }, { upsert: true });
+};
+
+CasesSchema.statics.deleteCases = function (cases) {
+
+    const query = {
+        '_id': {
+            '$in': cases.map((aCase) => ObjectId(aCase._id))
+        }
+    };
+
+    return this.updateMany(query, { '$set': { status: 'DELETED' } }, { upsert: true });
 };
 
 CasesSchema.statics.findBeetweenPrices = function (min, max) {

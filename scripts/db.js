@@ -8,7 +8,8 @@ db.fieldsPermissions.insertMany([
             "menu": [
                 { "path": "/", "label": "Pesquisa" },
                 { "path": "/case", "label": "Novo Caso" },
-                { "path": "/penging", "label": "Pendencias" }
+                { "path": "/penging", "label": "Pendencias" },
+                { "path": "/cases", "label": "Casos" }
             ]
         }
     },
@@ -17,7 +18,8 @@ db.fieldsPermissions.insertMany([
         "fields": {
             "menu": [
                 { "path": "/", "label": "Pesquisa" },
-                { "path": "/case", "label": "Novo Caso" }
+                { "path": "/case", "label": "Novo Caso" },
+                { "path": "/penging", "label": "Pendencias" }
             ]
         }
     },
@@ -58,10 +60,10 @@ db.getCollection('attributes_copy').aggregate([
 ])
 
 db.getCollection('attributes_copy').aggregate([
-    { $group: {_id: null, childrens: {$push: "$options.childrens"}}}
+    { $group: { _id: null, childrens: { $push: "$options.childrens" } } }
 ])
 
 db.getCollection('attributes_copy').aggregate([
-    { $group: {_id: null, childrens: {$push: "$options.parent"}}},
-    { $project: {_id: 0,'childrens': 1}}
+    { $group: { _id: null, childrens: { $push: "$options.parent" } } },
+    { $project: { _id: 0, 'childrens': 1 } }
 ])

@@ -3,9 +3,19 @@ module.exports = (app) => {
     const model = app.api.models.cases;
 
     const getAll = async (req, res) => {
-        const cases = await model.find({});
+        try {
+            const User = req.user;
+            if (!User || User.role !== 'ADMIN')
+                return res.status(401).send({ message: 'Usuario nao autorizado!' });
 
-        return res.status(200).send(cases);
+            const casesPending = await model.findCases();
+
+            if (!casesPending) return res.status(401).send({ message: 'Erro na busca de casos' });
+
+            return res.status(200).send(casesPending);
+        } catch (err) {
+            return res.status(401).send({ message: 'Erro desconhecido' });
+        }
     };
 
     const create = async (req, res) => {
@@ -27,34 +37,66 @@ module.exports = (app) => {
 
     const getCasesPending = async (req, res) => {
         try {
-            if (!req.user || req.user.role !== 'ADMIN') return res.status(400).send('Usuario Nao autorizado!');
+            const User = req.user;
+            let casesPending;
+            if (!User || (User.role !== 'ADMIN' && User.role !== 'HELPER'))
+                return res.status(401).send('Usuario Nao autorizado!');
 
-            const casesPending = await model.findPending();
+            if (User.role === 'HELPER')
+                casesPending = await model.findPendingByHelper(User.username);
+            else
+                casesPending = await model.findPending();
 
-            if (!casesPending) return res.status(400).send('Error in search cases pending');
+            if (!casesPending)
+                return res.status(401).send({ message: 'Erro em buscar casos pendentes!' });
 
             return res.status(200).send(casesPending);
         } catch (err) {
-            return res.status(400).send('Error Pending');
+            return res.status(401).send({ message: 'Erro desconhecido' });
         }
     };
 
     const approveCase = async (req, res) => {
         try {
             const { pendencies } = req.body;
+            const User = req.user;
+            let result;
 
-            if (!pendencies || !pendencies.length) return res.status(400).send('ERROR APPROVE CASE');
+            if (!User || (User.role !== 'ADMIN' && User.role !== 'HELPER'))
+                return res.status(401).send({ message: 'Nao Autorizado' });
+            if (!pendencies || !pendencies.length) return res.status(401).send({ message: 'Nao existem pendencias!' });
 
-            const result = await model.ApprovePendencies(pendencies);
+            if (User.role === 'HELPER')
+                result = await model.ApprovePendenciesByHelper(pendencies);
+            else
+                result = await model.ApprovePendencies(pendencies);
 
-            if (!result) return res.status(400).send('Error in Changes');
+            if (!result) return res.status(400).send('error nas mudanças!');
 
-            return res.status(200).send([]);
+            return res.status(200).send({ message: 'Aprovados com sucesso!' });
         } catch (err) {
             console.log(err);
-            return res.status(500).send([]);
+            return res.status(500).send({ message: 'Erro desconhecido!' });
         }
     };
 
-    return { getAll, create, getCasesPending, approveCase };
+    const deleteCase = async (req, res) => {
+        try {
+            const { cases } = req.body;
+            const User = req.user;
+
+            if (!User || (User.role !== 'ADMIN' && User.role !== 'HELPER'))
+                return res.status(401).send({ message: 'Nao Autorizado' });
+
+            const result = await model.deleteCases(cases);
+
+            if (!result) return res.status(400).send('Erro nas mudanças!');
+
+            return res.status(200).send({ message: 'Deletado com sucesso!' });
+        } catch (err) {
+
+        }
+    };
+
+    return { getAll, create, getCasesPending, approveCase, deleteCase };
 };
